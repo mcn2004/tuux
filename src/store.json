@@ -1,0 +1,17 @@
+[
+    {
+        "name": "jaguar",
+        "cost": 500,
+        "img": "jaguar.jpg"
+    },
+    {
+        "name": "calavera",
+        "cost": 250,
+        "img": "calaveras.jpeg"
+    },
+    {
+        "name": "muneca",
+        "cost": 100,
+        "img": "muneca.jpeg"
+    }
+]
