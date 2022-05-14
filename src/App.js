@@ -1,24 +1,19 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
-/* eslint-disable jsx-a11y/alt-text */
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Dropdown } from "react-bootstrap";
 import { setMetaData } from "./api/axios-service";
 import Modal from "react-modal";
 import Receipt from "./receipt";
 import menu from "./store.json";
 
-// Base url for holacash api environment
 const holacashApiBaseUrl = "https://sandbox.api.holacash.mx/v2";
 
-// Copy and paste your public key here
 const HOLACASH_PUBLIC_KEY = process.env.REACT_APP_MERCHANT_PUBLIC_KEY;
 
 function App() {
-  const [selectedMenuItem, setSelectedMenuItem] = useState({});
-  const [orderId, setOrderId] = useState(); // order id from create order
+  const [setSelectedMenuItem] = useState({});
+  const [orderId, setOrderId] = useState();
   const [orderLoading, setOrderLoading] = useState(false);
 
   useEffect(() => {
@@ -34,28 +29,6 @@ function App() {
     generateOrder(item);
   };
 
-  // Dropdown Menu React Logic
-  const DropdownMenu = () => {
-    return (
-      <Dropdown onSelect={(item) => onChangeItem(item)}>
-        <Dropdown.Toggle variant="success" id="dropdown-basic">
-          {selectedMenuItem?.name || "Select an item"}
-        </Dropdown.Toggle>
-
-        <Dropdown.Menu>
-          {menu.map((item, index) => {
-            return (
-              <Dropdown.Item key={index} eventKey={index}>{`${item.name} - $${
-                item.cost
-              }`}</Dropdown.Item>
-            );
-          })}
-        </Dropdown.Menu>
-      </Dropdown>
-    );
-  };
-
-  // Creating an order https://developers.holacash.mx/openapi/cash/#tag/order
   const generateOrder = async (item) => {
     setOrderLoading(true);
     try {
@@ -63,7 +36,7 @@ function App() {
         holacashApiBaseUrl + "/order",
         {
           order_total_amount: {
-            amount: item.price,
+            amount: item.cost,
             currency_code: "MXN",
           },
           description: item.name,
@@ -76,42 +49,34 @@ function App() {
         }
       );
 
+      console.log(response);
+
       setOrderLoading(false);
 
-      // verifying correct response from create order
       if (response?.data?.order_information?.order_id) {
         setOrderId(response?.data?.order_information?.order_id);
         console.log("ORDER ID:", response?.data?.order_information?.order_id);
-        //callbacks can be passed into the widget configuration this are triggered whenever a certain event happens.
 
         const callbacks = {
-          // onSuccess happens when a charge is created correctly.
           onSuccess: (res) => {
             setSuccessResponse(JSON.parse(res));
             setReceiptVisible(true);
             console.log("onSuccess", JSON.parse(res));
           },
 
-          // onAbort happens when the users intentionally close the widget
           onAbort: () => console.log("onAbort callback"),
 
-          // onError happens when the holacash service cannot succesfully generate a charge correctly at that moment
           onError: (err) => console.log(JSON.stringify(err)),
 
-          // onEmailEntered is called when the user completes entering an email
           onEmailEntered: (email) => console.log(email),
 
-          // onCheckoutStart is called when the checkout page is presented
           onCheckoutStart: () => console.log("checkout started"),
-
-          // We will use the check callback to determine if Cash Pay should proceed.
-          // This must return a boolean
+          
           check: () => {
             return true;
           },
         };
 
-        // Initializing widget with order information
         // eslint-disable-next-line no-undef
         HolaCashCheckout.configure(
           {
@@ -132,17 +97,28 @@ function App() {
     }
   };
 
+
+  // Dropdown Menu React Logic
+
   return (
     <div className="App">
       <header className="App-header">
-        <a className="App-link" target="_blank" rel="noopener noreferrer">
-          Artesanias Mexicanas
-        </a>
-        <p>Selecciona tu artesania favorita</p>
+        <div style={{ paddingBottom: 0.5 + 'em' }}>
+          <a className="App-link" target="_blank" rel="noopener noreferrer">
+            Artesanias Mexicanas
+          </a>
+          <p>Selecciona tu artesania favorita</p>
+        </div>
 
-        <DropdownMenu />
+        {
+          menu.map(obj =>
+            <button key={obj.id.toString()} onClick={() => onChangeItem(obj.id)} style={{ paddingBottom: 0.5 + 'em' }} >
+              <img src={obj.img} style={{ width: 240 + 'px' }}></img>
+              <p>{obj.name} - ${obj.cost / 100}</p>
+            </button>
+          )
+        }
 
-        {/* Creating Button object  */}
         <div id="instant-holacash-checkout-button">
           <object
             id="checkout-button"
@@ -160,7 +136,7 @@ function App() {
               setReceiptVisible(false);
             }}
           >
-            Done
+            Listo!
           </button>
         </div>
       </Modal>

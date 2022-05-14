@@ -1,17 +1,20 @@
 [
     {
-        "name": "jaguar",
-        "cost": 500,
+        "id": 0,
+        "name": "Jaguar",
+        "cost": 50000,
         "img": "jaguar.jpg"
     },
     {
-        "name": "calavera",
-        "cost": 250,
+        "id": 1,
+        "name": "Calavera",
+        "cost": 25000,
         "img": "calaveras.jpeg"
     },
     {
-        "name": "muneca",
-        "cost": 100,
+        "id": 2,
+        "name": "Muñeca",
+        "cost": 10000,
         "img": "muneca.jpeg"
     }
 ]
